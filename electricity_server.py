@@ -9,7 +9,7 @@ async def elec_api(room: str):
     resp = {}
     try:
         name, result = await query_electricity(room)
-        print(result)
+        # print(result)
         resp['success'] = True
         resp['type'] = result[0]
         resp['number'] = result[1]
