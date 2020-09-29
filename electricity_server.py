@@ -2,7 +2,11 @@
 
 from fastapi import FastAPI, status
 from electricity import query_electricity, InvalidRoomNameError
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/electricity")
 async def elec_api(room: str):
@@ -23,3 +27,4 @@ async def elec_api(room: str):
         resp['error'] = str(e)
     
     return resp
+
