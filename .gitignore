@@ -123,3 +123,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+data/test_async_timed_resouce.json
