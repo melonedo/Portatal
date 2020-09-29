@@ -68,24 +68,22 @@ async def get_left_electricity(data):
 async def query_electricity(room_name):
     "解析房间名并在能源管理中心查询电费。"
     try:
-        room = parse_room(room_name)
+        room, std_name = parse_room(room_name)
     except Exception as e:
-        raise InvalidRoomNameError(e)
+        if isinstance(e, InvalidRoomNameError):
+            raise
+        else:
+            raise InvalidRoomNameError(e)
     elec = await get_left_electricity(room)
-    room_arabic = list(map(normalize_name, room))
-    if room_arabic[1] in room_arabic[3]:
-        room_name = room[3].strip()
-    else:
-        room_name = room[1].strip() + room[3].strip()
-    return room_name, elec
+    return std_name, elec
 
 
 async def main():
-    await query_electricity('西北三139')
     names = '西南一1023;8—404;20- 533;博士3号楼1303;西南11 216;西北三139;西南二539-1;彰武三1406;彰武8 1413'.split(';')
     for r in await asyncio.gather(*map(query_electricity, names)):
+        assert r[1] == (await query_electricity(r[0]))[1]
         print(r)
 
 
 if __name__ == "__main__":
-    print(asyncio.run(main()))
+    asyncio.run(main())

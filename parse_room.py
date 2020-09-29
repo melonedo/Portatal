@@ -41,7 +41,7 @@ def normalize_name(name: str) -> str:
     "把楼名做标准化处理"
     name = name.strip()
     name = chinese_number_to_arabic(name)
-    name = re.sub(r'0+(\d+)', r'\1', name)
+    name = re.sub(r'(?!\d)0+(\d+)', r'\1', name)
     name = name.replace("博士生", "博士")
     name = re.sub(r'号?(楼|公寓)$', '', name)
     return name
@@ -125,7 +125,16 @@ def parse_room(name: str):
     else:  # SIMS
         room_name = room
 
-    return (belong, raw_building, floor_name, room_name)
+    raw_bd_nm = normalize_name(raw_building)
+    room_name_nm = normalize_name(room_name)
+    if raw_bd_nm in room_name_nm:
+        std_name = room_name_nm
+    else:
+        std_name = raw_building + ' ' + room_name_nm
+    if '彰武' in building:
+        std_name = '彰武' + std_name
+
+    return (belong, raw_building, floor_name, room_name), std_name
 
 
 with open('data/buildings.json', encoding='utf-8') as f:
