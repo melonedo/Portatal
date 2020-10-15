@@ -20,10 +20,10 @@ async def elec_api(room: str):
         resp['unit'] = result[2]
         resp['name'] = name
     except InvalidRoomNameError as e:
-        resp['sucess'] = False
+        resp['success'] = False
         resp['error'] = repr(e)
     except Exception as e:
-        resp['sucess'] = False
+        resp['success'] = False
         resp['error'] = str(e)
     
     return resp
