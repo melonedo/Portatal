@@ -68,7 +68,7 @@ HAOLOU_SET = {13, 14, 15, 17, 18, 19, 20}
 
 def preprocess_jiading(room_name):
     "把12-404格式的房间名改成对应楼名，如“友园12号楼404”"
-    m = re.match(r'(\d+)\s*[-—]\s*(\d+)', room_name)
+    m = re.match(r'\s*(\d+)\s*[-—]\s*(\d+)', room_name)
     if m is None:
         return room_name
     building = int(m.group(1))
