@@ -6,6 +6,10 @@ app = FastAPI()
 
 ip = None
 
+@app.get("/")
+async def hello():
+    return {"hello": "world!"}
+
 @app.get("/pi/{more_path:path}")
 async def forward(req: Request, more_path: str):
     return RedirectResponse(ip + more_path, 307, req.headers)
@@ -17,7 +21,7 @@ async def elec_ws(ws: WebSocket):
         await ws.close()
         return
     await ws.accept()
-    ip = f"http://{ws.client.host}:1234/"
+    ip = f"http://{ws.client.host}:4321/"
     
     print(f"{ip} connected")
     try:
