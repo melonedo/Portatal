@@ -16,4 +16,4 @@ def dict_to_xml(xml_dict):
             e.text = str(v)
         else:
             e.text = etree.CDATA(v)
-    return etree.tostring(tree)
+    return etree.tostring(tree, encoding='unicode')

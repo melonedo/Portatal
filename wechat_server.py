@@ -57,10 +57,10 @@ async def receive_msg(req: Request):
     if not text.startswith('电费'):
         return PlainTextResponse("success")
     async with ClientSession() as s:
-        resp = await s.get(ip + "electricity", params=text[2:])
+        resp = await s.get(ip + "electricity", params={'room': text[2:]})
         elec = await resp.json()
         if elec['success']:
-            content = f"{elec['name']}剩余{elec['type']}: {elec['num']}{elec['unit']}"
+            content = f"{elec['name']}剩余{elec['type']}: {elec['number']}{elec['unit']}"
         else:
             content = f"查询失败: {elec['error']}"
     resp={
