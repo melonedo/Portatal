@@ -1,8 +1,9 @@
 
-from fastapi import FastAPI, WebSocketDisconnect, WebSocket
+from fastapi import FastAPI, WebSocketDisconnect, WebSocket, Request
 from hashlib import sha1
 import json
 from fastapi.responses import PlainTextResponse
+from wechat_xml import dict_to_xml, xml_to_dict
 
 app = FastAPI()
 
@@ -42,3 +43,18 @@ async def websocket_endpoint(ws: WebSocket):
         print(f"{ip} disconnected")
         ip = None
         await ws.close()
+
+@app.post("/wechat")
+async def receive_msg(req: Request):
+    body = xml_to_dict(await req.body().decode('utf-8'))
+    if body['MsgType'] != 'TEXT':
+        return PlainTextResponse("success")
+    content = "hello"
+    resp = {
+        'ToUserName': body['FromUserName'],
+        'FromUserName': body['ToUserName'],
+        'CreateTime': int(body['CreateTime']),
+        'MsgType': 'TEXT',
+        'Content': content,
+    }
+    return PlainTextResponse(dict_to_xml(resp))
