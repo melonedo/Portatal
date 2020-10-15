@@ -16,6 +16,8 @@ async def main():
                         await ws.receive_str()
             except KeyboardInterrupt:
                 break
+            except Exception as e:
+                print(repr(e))
             print("Websocket disconnected, retry in 5 mins.")
             await asyncio.sleep(300)
         
