@@ -46,15 +46,16 @@ async def websocket_endpoint(ws: WebSocket):
 
 @app.post("/wechat")
 async def receive_msg(req: Request):
-    body = xml_to_dict(await req.body().decode('utf-8'))
-    if body['MsgType'] != 'TEXT':
+    body = xml_to_dict((await req.body()).decode('utf-8'))
+    if body['MsgType'] != 'text':
         return PlainTextResponse("success")
     content = "hello"
     resp = {
         'ToUserName': body['FromUserName'],
         'FromUserName': body['ToUserName'],
         'CreateTime': int(body['CreateTime']),
-        'MsgType': 'TEXT',
+        'MsgType': 'text',
         'Content': content,
+        'MsgId': body['MsgId'],
     }
     return PlainTextResponse(dict_to_xml(resp))

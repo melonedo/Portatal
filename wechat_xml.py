@@ -13,7 +13,7 @@ def dict_to_xml(xml_dict):
     for k, v in xml_dict.items():
         e = etree.SubElement(tree, k)
         if isinstance(v, int):
-            e.text = v
+            e.text = str(v)
         else:
             e.text = etree.CDATA(v)
     return etree.tostring(tree)
