@@ -5,6 +5,7 @@ import json
 from fastapi.responses import PlainTextResponse
 from wechat_xml import dict_to_xml, xml_to_dict
 from aiohttp import ClientSession
+import aiofiles
 
 app = FastAPI()
 
@@ -37,6 +38,8 @@ async def websocket_endpoint(ws: WebSocket):
     ip = f"http://{ws.client.host}:4321/"
 
     print(f"{ip} connected")
+    async with aiofiles.open("ip.txt", "wt") as f:
+        await f.write(ip)
     try:
         while True:
             # Not much to do
@@ -72,3 +75,13 @@ async def receive_msg(req: Request):
         'MsgId': body['MsgId'],
     }
     return PlainTextResponse(dict_to_xml(resp))
+
+
+
+@app.get("/pi/electricity")
+async def redir_electricity(room: str):
+    async with ClientSession() as s:
+        resp = await s.get(ip + "electricity", params={'room': room})
+        elec = await resp.text()
+        return PlainTextResponse(elec)
+
