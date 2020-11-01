@@ -2,10 +2,11 @@
 from fastapi import FastAPI, WebSocketDisconnect, WebSocket, Request
 from hashlib import sha1
 import json
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import Response
 from wechat_xml import dict_to_xml, xml_to_dict
 from aiohttp import ClientSession
 import aiofiles
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -35,7 +36,7 @@ async def websocket_endpoint(ws: WebSocket):
         await ws.close()
         return
     await ws.accept()
-    ip = f"http://{ws.client.host}:4321/"
+    ip = ws.client.host
 
     print(f"{ip} connected")
     async with aiofiles.open("ip.txt", "wt") as f:
@@ -60,7 +61,7 @@ async def receive_msg(req: Request):
     if not text.startswith('电费'):
         return PlainTextResponse("success")
     async with ClientSession() as s:
-        resp = await s.get(ip + "electricity", params={'room': text[2:]})
+        resp = await s.get(f"http://{ip}:4321/electricity", params={'room': text[2:]})
         elec = await resp.json()
         if elec['success']:
             content = f"{elec['name']}剩余{elec['type']}: {elec['number']}{elec['unit']}"
@@ -74,14 +75,23 @@ async def receive_msg(req: Request):
         'Content': content,
         'MsgId': body['MsgId'],
     }
-    return PlainTextResponse(dict_to_xml(resp))
+    return Response(dict_to_xml(resp))
 
 
 
 @app.get("/pi/electricity")
 async def redir_electricity(room: str):
     async with ClientSession() as s:
-        resp = await s.get(ip + "electricity", params={'room': room})
-        elec = await resp.text()
-        return PlainTextResponse(elec)
+        resp = await s.get(f"http://{ip}:4321/electricity", params={'room': room})
+        json = await resp.text()
+        return Response(json, media_type="application/json")
 
+class CrackQuery(BaseModel):
+    data_url: str
+
+@app.post("/pi/crack")
+async def redir_crack(query: CrackQuery):
+    async with ClientSession() as s:
+        resp = await s.get(f"http://{ip}:4322/crack", json=query)
+        json = await resp.text()
+        return Response(json, media_type="application/json")
