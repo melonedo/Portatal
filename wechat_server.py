@@ -92,6 +92,6 @@ class CrackQuery(BaseModel):
 @app.post("/pi/crack")
 async def redir_crack(query: CrackQuery):
     async with ClientSession() as s:
-        resp = await s.get(f"http://{ip}:4322/crack", json=query)
+        resp = await s.post(f"http://{ip}:4322/crack", json=query.dict())
         json = await resp.text()
         return Response(json, media_type="application/json")
