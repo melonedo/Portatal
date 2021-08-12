@@ -75,13 +75,12 @@ async def query_electricity(room_name):
         else:
             raise InvalidRoomNameError(e)
     elec = await get_left_electricity(room)
-    std_name = re.sub(r"号楼?\s*", "号楼", std_name)
-    std_name = re.sub(r"^((?:19|20)号楼)", r"友园\1", std_name)
+
     return std_name, elec
 
 
 async def main():
-    names = '西南一1023;8—404;20- 533;博士3号楼1303;西南11 216;西北三139;西南二539-1;彰武三1406;彰武8 1413'.split(';')
+    names = '西南一1023;8—404;20- 533;13-543;博士3号楼1303;西南11 216;西北三139;西南二539-1;彰武三1406;彰武8 1413'.split(';')
     for r in await asyncio.gather(*map(query_electricity, names)):
         print(r)
 

@@ -134,6 +134,9 @@ def parse_room(name: str):
         std_name = raw_building + ' ' + room_name_nm
     if '彰武' in building:
         std_name = '彰武' + std_name
+    std_name = std_name.replace(" ", "")
+    std_name = re.sub(r"号楼?(?!公寓)", r"号楼", std_name)
+    std_name = re.sub(r"^((?:19|20)号楼?|\d+号公寓)", r"友园\1", std_name)
 
     return (belong, raw_building, floor_name, room_name), std_name
 
