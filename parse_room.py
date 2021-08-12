@@ -8,13 +8,13 @@ class InvalidRoomNameError(ValueError):
 
 
 CN_TO_AR_TRANS = str.maketrans('一二三四五六七八九', '123456789')
-CN_NUM_PATTER = r'[一二三四五六七八九十]{1,3}'
+CN_NUM_PATTERN = r'[一二三四五六七八九十]{1,3}'
 
 
 @lru_cache(maxsize=None)
 def cn_num_to_arabic(cn_num: re.Match) -> str:
     "cn_num是100以内的中文数字，将其转换为对应的阿拉伯数字"
-    # assert re.fullmatch(CN_NUM_PATTER) is not None
+    # assert re.fullmatch(CN_NUM_PATTERN) is not None
     ara_num = cn_num[0].translate(CN_TO_AR_TRANS)
 
     if len(ara_num) == 1:  # 1-10
@@ -33,7 +33,7 @@ def cn_num_to_arabic(cn_num: re.Match) -> str:
 
 
 def chinese_number_to_arabic(name):
-    return re.sub(CN_NUM_PATTER, cn_num_to_arabic, name)
+    return re.sub(CN_NUM_PATTERN, cn_num_to_arabic, name)
 
 
 @lru_cache(maxsize=None)
@@ -44,6 +44,7 @@ def normalize_name(name: str) -> str:
     name = re.sub(r'(?!\d)0+(\d+)', r'\1', name)
     name = name.replace("博士生", "博士")
     name = re.sub(r'号?(楼|公寓)$', '', name)
+    name = re.sub('号楼', '号', name)
     return name
 
 
