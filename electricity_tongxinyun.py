@@ -143,10 +143,11 @@ def query_electricity(room_name):
     form = data.copy()
     form['userId'] = userid
     form['isDefault'] = False
+    nodelete = False
     with sess.post(f"https://tjpay.tongji.edu.cn:8080/user/merchant/elec/dorms?userId={userid}", json=form) as resp:
         code = resp.json()['code']
         if code == 1 and resp.json()['msg'] == "该宿舍楼已绑定":
-            pass
+            nodelete = True
         else:
             assert code == 0
     # 查询
@@ -156,9 +157,10 @@ def query_electricity(room_name):
             if item['areaName'] == data['areaName'] and item['room'] == data['room']:
                 result = item['remain']
     # 删除
-    with sess.delete(f"https://tjpay.tongji.edu.cn:8080/user/merchant/elec/dorms/area/{data['area']}/room/{quote(data['room'])}/building/{quote(data['building'])}/userId/{userid}") as resp:
-        assert resp.json()['code'] == 0
-    print(result)
+    if not nodelete:
+        with sess.delete(f"https://tjpay.tongji.edu.cn:8080/user/merchant/elec/dorms/area/{data['area']}/room/{quote(data['room'])}/building/{quote(data['building'])}/userId/{userid}") as resp:
+            assert resp.json()['code'] == 0
+    return data['areaName'] + data['building'] + data['room'], ("剩余电量", result, "度")
 
 def main(room):
     sess, userid = login(user,passwd)
