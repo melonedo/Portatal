@@ -54,7 +54,7 @@ def login(user, passwd) -> requests.Session:
     })
     if resp.json()['msg'] != 'success':
         print('认证失败')
-        return
+        raise RuntimeError("认证失败")
     userid = resp.json()['data']['userId']
     sess.headers['Authorization'] = resp.headers['Authorization']
     print(f'认证成功 Authorization: {resp.headers["Authorization"]}')
@@ -103,15 +103,16 @@ def get_room_data(room_name):
     area_map = {'四平路校区ISIMS': ('四平路校区', '本部电控1'),
                 '彰武路校区SIMS': ('彰武校区', '航校校区'),
                 '彰武路校区ISIMS': ('彰武校区', '航校校区1'),
-                '嘉定校区SIMS': ('嘉定校区' '嘉定校区'),
+                '嘉定校区SIMS': ('嘉定校区', '嘉定校区'),
                 '嘉定校区ISIMS': ('嘉定校区', '嘉定校区1')}
     area_name = room[0]
     if area_name not in area_map:
         raise InvalidRoomNameError("暂不支持此校区：{area}")
+    print(area_map[area_name])
     school_name, area_name = area_map[area_name]
     school = room_lib[school_name]
     area = school['areas'][area_name]
-    building = area['buildings'][room[1]]
+    building = area['buildings'][room[1].strip()]
     rooms = building['rooms']
     m = re.search(r'\d+$', room[3])
     if not m:
@@ -162,10 +163,12 @@ def query_electricity(room_name):
             assert resp.json()['code'] == 0
     return data['areaName'] + data['building'] + data['room'], ("剩余电量", result, "度")
 
+
 def main(room):
     sess, userid = login(user,passwd)
     get_lib(sess)
     query_electricity(room)
 
 if __name__ == '__main__':
-    query_electricity('7-123')
+    # print(query_electricity('7-123'))
+    print(query_electricity('14-636'))
