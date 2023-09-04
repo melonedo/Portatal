@@ -51,18 +51,6 @@ def normalize_name(name: str) -> str:
 BUILDINGS_MAP_NORMALIZED = {}  # 初始化的部分在下面
 
 
-def parse_xinan1_floor(room):
-    "处理西南一非常奇妙的楼层名"
-    floor = room[0]
-    if room[1] == '0':
-        if floor == '3':
-            return "西南一号楼3000-3099"
-        else:
-            return f"西南一号楼{floor}001-{floor}099"
-    else:
-        return f"西南一号楼{floor}100-{floor}199"
-
-
 YOUYUAN_SET = {*range(2, 11),  12, 16}
 HAOLOU_SET = {13, 14, 15, 17, 18, 19, 20}
 
@@ -102,7 +90,8 @@ def parse_room(name: str):
 
     if building == '西南1':
         # 特例
-        floor_name = parse_xinan1_floor(room)
+        raise InvalidRoomNameError("西南一号楼无法查询")
+        floor_name = f"{room[0:2]}01-{room[0:2]}99"
     else:
         if '博士' in building or '彰武' in building:
             floor = room[:-2]
