@@ -34,30 +34,27 @@ def login(user, passwd) -> requests.Session:
         'deviceType': '?',
     }).json()
     if not resp['success']:
-        print('登陆失败')
-        return
+        raise RuntimeError("登陆失败")
     token = resp['data']['token']
-    print(f'获取到 Opentoken: {token}')
+    # print(f'获取到 Opentoken: {token}')
     sess.headers['Opentoken'] = token
     resp = sess.post('https://txb.tongji.edu.cn/gateway/ticket/terminal/lappAccess', data={
         'appId': '200019',
         'deviceType': '1',
     }).json()
     if not resp['success']:
-        print('获取 App 数据失败')
-        return
-    print(f"校园钱包2.0: {resp['data']['url']}")
+        raise RuntimeError("获取 App 数据失败")
+    # print(f"校园钱包2.0: {resp['data']['url']}")
     ticket = re.findall('ticket=([\w\d]*)', resp['data']['url'])[0]
-    print(f'获取到ticket: {ticket}')
+    # print(f'获取到ticket: {ticket}')
     resp = sess.post('https://tjpay.tongji.edu.cn:8080/user/login', data={
         'ticket': ticket,
     })
     if resp.json()['msg'] != 'success':
-        print('认证失败')
         raise RuntimeError("认证失败")
     userid = resp.json()['data']['userId']
     sess.headers['Authorization'] = resp.headers['Authorization']
-    print(f'认证成功 Authorization: {resp.headers["Authorization"]}')
+    # print(f'认证成功 Authorization: {resp.headers["Authorization"]}')
     return sess, userid
 
 
@@ -99,7 +96,7 @@ def get_lib(sess):
 
 def get_room_data(room_name):
     room, std_name = parse_room(room_name)
-    print(room)
+    # print(room)
     area_map = {'四平路校区ISIMS': ('四平路校区', '本部电控1'),
                 '彰武路校区SIMS': ('彰武校区', '航校校区'),
                 '彰武路校区ISIMS': ('彰武校区', '航校校区1'),
@@ -108,7 +105,7 @@ def get_room_data(room_name):
     area_name = room[0]
     if area_name not in area_map:
         raise InvalidRoomNameError("暂不支持此校区：{area}")
-    print(area_map[area_name])
+    # print(area_map[area_name])
     school_name, area_name = area_map[area_name]
     school = room_lib[school_name]
     area = school['areas'][area_name]
@@ -136,9 +133,9 @@ def query_electricity(room_name):
         pass
     resp = sess.get(
         f'https://tjpay.tongji.edu.cn:8080/user/merchant/elec/dorms/list?userId={userid}').json()
-    for item in resp['data']:
-        print(' '.join([item['areaName'], item['building'],
-                        item['room'], str(item['remain'])]))
+    # for item in resp['data']:
+    #     print(' '.join([item['areaName'], item['building'],
+    #                     item['room'], str(item['remain'])]))
 
     # 添加
     form = data.copy()
@@ -161,7 +158,7 @@ def query_electricity(room_name):
     if not nodelete:
         with sess.delete(f"https://tjpay.tongji.edu.cn:8080/user/merchant/elec/dorms/area/{data['area']}/room/{quote(data['room'])}/building/{quote(data['building'])}/userId/{userid}") as resp:
             assert resp.json()['code'] == 0
-    return data['areaName'] + data['building'] + data['room'], ("剩余电量", result, "度")
+    return data['areaName'] + ' ' + data['building'] + data['room'], ("剩余电量", result, "度")
 
 
 def main(room):
