@@ -81,7 +81,7 @@ async def query_electricity(room_name):
 
 async def main():
     # 没有西南一
-    names = '8—404;20- 533;13-543;博士3号楼1303;西南11 216;西北三139;西南二539-1;彰武三1406;彰武8 1413;12-711'.split(';')
+    names = '西南一1022;8—404;20- 533;13-543;博士3号楼1303;西南11 216;西北三139;西南二539-1;彰武三1406;彰武8 1413;12-711'.split(';')
     for r in await asyncio.gather(*map(query_electricity, names)):
         print(r)
 

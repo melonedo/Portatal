@@ -125,3 +125,4 @@ dmypy.json
 .pyre/
 data/test_async_timed_resouce.json
 data/secrets.json
+data/database.json

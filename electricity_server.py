@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from electricity import query_electricity, InvalidRoomNameError
+from electricity_viewstate import query_electricity, InvalidRoomNameError
 from electricity_tongxinyun import query_electricity as query_electricity_tongxinyun
 import threading
 
@@ -11,7 +11,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Uncomment to use nyglzx API
-# @app.get("/electricity")
+@app.get("/electricity")
 async def elec_api(room: str):
     resp = {}
     try:
@@ -32,7 +32,7 @@ async def elec_api(room: str):
     return resp
 
 lock = threading.Lock()
-@app.get("/electricity")
+# @app.get("/electricity")
 def elec_api_tongxinyun(room: str):
     resp = {}
     try:
